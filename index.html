@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Kanka2 Mobile V11.1</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#080808;color:white;font-family:Arial;overflow:hidden;touch-action:none}
+#view{width:100vw;height:100vh;overflow:hidden;position:relative;background:#111}
+#world{position:absolute;width:2500px;height:2000px;transform-origin:0 0;background:
+radial-gradient(ellipse at 52% 43%,rgba(184,155,92,.30),transparent 23%),
+linear-gradient(45deg,rgba(255,255,255,.045) 25%,transparent 25%),
+linear-gradient(-45deg,rgba(0,0,0,.10) 25%,transparent 25%),
+#3f7f3d;background-size:100% 100%,95px 95px,95px 95px}
+.path{position:absolute;background:linear-gradient(#a98759,#806038);border:3px solid #5e4326;border-radius:70px;box-shadow:inset 0 0 18px #0005}
+.obj{position:absolute;transform:translate(-50%,-80%);text-align:center;user-select:none}
+.name{background:#000b;padding:2px 7px;border-radius:8px;font-size:11px;white-space:nowrap;text-shadow:1px 1px #000;margin-top:2px}
+.house{width:120px;height:95px;background:linear-gradient(#bba06b,#6b4b2e);border:3px solid #3c2a1b;border-radius:8px;box-shadow:0 14px 8px #0008}
+.house:before{content:"";position:absolute;left:-12px;top:-40px;width:140px;height:58px;background:linear-gradient(135deg,#315fa8,#16315e);clip-path:polygon(50% 0,100% 100%,0 100%);filter:drop-shadow(0 4px 2px #0008)}
+.house.big{width:155px;height:115px}.house.big:before{width:180px;height:68px}
+.tree{width:55px;height:88px}.tree:before{content:"";position:absolute;left:20px;bottom:0;width:15px;height:38px;background:#55351f;border-radius:8px}.tree:after{content:"";position:absolute;left:0;top:0;width:55px;height:65px;background:radial-gradient(circle at 50% 35%,#4ba643,#1d5b25);clip-path:polygon(50% 0,100% 85%,0 85%);filter:drop-shadow(0 9px 5px #0007)}
+.npc{width:36px;height:52px;background:linear-gradient(#d8b86d 0 18%,#2a5d9f 19% 55%,#343434 56%);border:2px solid #111;border-radius:14px 14px 9px 9px;box-shadow:0 10px 6px #0008;z-index:60}.npc .icon{position:absolute;right:-22px;top:9px;font-size:23px}
+#player{position:absolute;width:44px;height:56px;border-radius:45% 45% 35% 35%;background:linear-gradient(#d6b66a 0 18%,#234f9a 19% 55%,#444 56%);border:2px solid #151515;transform:translate(-50%,-80%);z-index:90;box-shadow:0 12px 7px #0007}
+#player:before{content:"⚔";position:absolute;right:-18px;top:13px;font-size:26px}
+#pname{position:absolute;transform:translate(-50%,-50%);z-index:110;text-align:center;font-size:12px;font-weight:bold;color:#ffd700;text-shadow:1px 1px 2px #000}
+.mob,.metin,.drop{position:absolute;transform:translate(-50%,-80%);text-align:center;z-index:65}.mob{font-size:38px}.metin{font-size:47px;filter:drop-shadow(0 0 10px #78d6ff)}
+.drop{font-size:27px;transform:translate(-50%,-50%);filter:drop-shadow(0 0 8px gold);z-index:80}.drop span{display:block;font-size:11px;background:#000b;color:#ffd700;border-radius:4px;padding:1px 5px;white-space:nowrap;text-shadow:1px 1px 2px #000}
+.hpbar{position:absolute;width:52px;height:7px;background:#300;border:1px solid #ddd;transform:translate(-50%,-50%);z-index:85}.hpbar div{height:100%;background:#d71919}
+#fx{position:absolute;display:none;transform:translate(-50%,-50%);font-size:36px;z-index:130}
+#hud{position:fixed;top:8px;left:8px;background:#000a;border-radius:10px;padding:8px;font-size:12px;z-index:200}
+.bar{height:8px;background:#222;border:1px solid #ddd;margin:3px 0}.fill{height:100%}#hpFill{background:#d71919;width:100%}#xpFill{background:#ffc400;width:0%}
+#mini{position:fixed;right:8px;top:8px;width:116px;height:96px;background:#000a;border:1px solid #77a7ff;border-radius:10px;z-index:205}
+#quest{position:fixed;right:8px;top:112px;background:#000a;border-radius:10px;padding:8px;font-size:11px;z-index:205;max-width:170px}
+#chat{position:fixed;left:8px;bottom:155px;width:230px;max-height:80px;overflow:auto;background:#0009;border-radius:8px;padding:6px;font-size:10px;z-index:205}
+#joy{position:fixed;left:18px;bottom:22px;width:124px;height:124px;border-radius:50%;background:#0007;border:2px solid #ffffff44;z-index:220;touch-action:none}
+#stick{position:absolute;left:38px;top:38px;width:48px;height:48px;border-radius:50%;background:#ffffff88}
+#actions{position:fixed;right:12px;bottom:25px;z-index:220;display:flex;gap:10px;align-items:flex-end}
+.act{border:0;border-radius:50%;color:white;background:#000c;box-shadow:0 4px 8px #0008}
+#attack{width:72px;height:72px;background:#9b0707;font-size:27px}#attack.hold{box-shadow:0 0 18px #ff4a4a;background:#d60a0a}
+#potion,#lootBtn{width:56px;height:56px;font-size:22px}#potion{background:#08751a}#lootBtn{background:#8a5a13}
+#skillbar{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);display:flex;gap:7px;z-index:220}.skill{width:45px;height:45px;border-radius:10px;border:1px solid #ffffff77;background:#000b;color:white;font-size:22px;position:relative}.skill small{position:absolute;top:1px;left:3px;color:#ffd36a;font-size:9px}
+.topBtn{position:fixed;width:46px;height:42px;border-radius:12px;background:#000b;border:1px solid #b18a42;z-index:220;font-size:22px;color:white}
+#bagBtn{right:8px;top:218px}#bonusBtn{right:62px;top:218px}#alchemyBtn{right:116px;top:218px}
+.panel{display:none;position:fixed;background:#120d07f2;border:2px solid #b18a42;border-radius:10px;padding:8px;z-index:260;font-size:11px}
+#inv{right:8px;top:265px;width:320px;max-height:395px;overflow:auto}
+#tabs{display:flex;gap:3px;margin:5px 0}.tab{flex:1;height:26px;background:#2a1c0f;color:#e6c46b;border:1px solid #76572a;border-radius:5px;font-size:11px}.tab.active{background:#6b3d12;color:white}
+#grid,#equip,#bonusItems,#bonusScrolls,#alchemySlots,#alchemyBag{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.slot,.eq,.bslot,.aslot{height:42px;background:#1d140b;border:1px solid #76572a;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:19px;position:relative}.slot small,.eq small,.bslot small,.aslot small{position:absolute;bottom:1px;font-size:7px;color:#e6c46b;white-space:nowrap;max-width:55px;overflow:hidden}
+#equip{grid-template-columns:repeat(4,1fr);margin-bottom:7px}.eq{height:48px}
+#detail,#bonusPanel,#alchemyPanel,#deathPanel,#shopPanel{left:50%;top:50%;transform:translate(-50%,-50%);width:310px;max-width:96vw}
+#detail{z-index:300;background:#090604f5}#bonusPanel{z-index:310;background:#0b0905f5;border-color:#54b85c}#alchemyPanel{z-index:310;background:#0b0d16f2;border-color:#67a7ff}
+#detail h3,#bonusPanel h3,#alchemyPanel h3,#shopPanel h3{margin:0 0 6px;text-align:center;color:#ffd36a}
+.bonusLine{color:#72ff72;line-height:1.35}.noBonus{color:#aaa}
+.panel button{margin:4px 2px;padding:7px;border:0;border-radius:8px;background:#6b3d12;color:white;font-size:11px}
+#deathPanel{z-index:330;text-align:center;background:#080604ee}
+#shopGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.shopItem{height:56px;background:#1a130b;border:1px solid #76572a;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;font-size:25px}.shopItem small{position:absolute;bottom:2px;font-size:8px;color:#e6c46b;white-space:nowrap;max-width:68px;overflow:hidden}.shopItem b{position:absolute;top:2px;right:4px;font-size:9px;color:#ffd700}
+
+#mountBtn{position:fixed;left:150px;bottom:25px;width:50px;height:50px;border-radius:50%;border:0;background:#5b3519;color:white;font-size:22px;z-index:220}
+#petBtn{position:fixed;left:207px;bottom:25px;width:50px;height:50px;border-radius:50%;border:0;background:#304f22;color:white;font-size:22px;z-index:220}
+#targetInfo{position:fixed;left:50%;top:8px;transform:translateX(-50%);background:#000b;border:1px solid #b18a42;border-radius:10px;padding:7px;width:190px;text-align:center;font-size:11px;z-index:230;display:none}
+#targetHp{height:7px;background:#300;border:1px solid #ddd;margin-top:4px}#targetHp div{height:100%;background:#d71919}
+.petObj{position:absolute;transform:translate(-50%,-80%);font-size:30px;z-index:75;filter:drop-shadow(0 7px 4px #0008)}
+.mount #player{width:50px;height:62px;background:linear-gradient(#d6b66a 0 15%,#234f9a 16% 45%,#7b4b2d 46%);border-color:#111}
+.mount #player:after{content:"🐎";position:absolute;left:-18px;bottom:-8px;font-size:36px;z-index:-1}
+</style></head>
+<body>
+<div id="view"><div id="world">
+<div class="path" style="left:240px;top:850px;width:1900px;height:140px"></div><div class="path" style="left:1120px;top:250px;width:140px;height:1350px"></div>
+<div class="obj house big" style="left:620px;top:455px"></div><div class="obj house big" style="left:1700px;top:450px"></div><div class="obj house" style="left:500px;top:1230px"></div><div class="obj house" style="left:1810px;top:1230px"></div>
+<div class="obj npc" onclick="talk('Köy Gardiyanı','Mavi köye hoş geldin GM[GADDAR].')" style="left:1120px;top:735px"><span class="icon">🛡️</span><div class="name">Köy Gardiyanı</div></div>
+<div class="obj npc" onclick="openShop('Silah Satıcısı',shopWeapons)" style="left:780px;top:770px"><span class="icon">⚔️</span><div class="name">Silahçı</div></div>
+<div class="obj npc" onclick="openShop('Zırhçı',shopArmors)" style="left:1460px;top:770px"><span class="icon">🛡️</span><div class="name">Zırhçı</div></div>
+<div class="obj npc" onclick="openShop('Market',shopMarket)" style="left:1120px;top:930px"><span class="icon">🛒</span><div class="name">Market</div></div>
+<div class="obj npc" onclick="openAlchemy()" style="left:1350px;top:1030px"><span class="icon">🔮</span><div class="name">Simyacı</div></div>
+<div id="metin1" class="metin" style="left:360px;top:1370px">💎<div class="name">Metin Taşı</div></div><div id="metin2" class="metin" style="left:2060px;top:640px">💎<div class="name">Metin Taşı</div></div><div id="wolf1" class="mob" style="left:320px;top:980px">🐺<div class="name">Aç Kurt</div></div><div id="wolf2" class="mob" style="left:2050px;top:1120px">🐺<div class="name">Aç Kurt</div></div>
+""" + "\n".join([f'<div class="obj tree" style="left:{x}px;top:{y}px"></div>' for x,y in [(170,260),(300,520),(260,1120),(310,1650),(520,1650),(720,170),(1320,170),(2030,290),(2130,580),(2100,1240),(1990,1650),(660,1640),(2240,880),(120,850)]]) + r"""
+<div id="pet" class="petObj" style="display:none">🦊</div><div id="player"></div><div id="pname">GM[GADDAR]<br><span id="lvName">Lv.1</span></div><div id="fx">💥</div>
+</div></div>
+
+<div id="hud"><b>Kanka2 V11.1</b><br>Lv:<span id="lv">1</span> Yang:<span id="yang">5000</span><br>Atk:<span id="atk">0</span> Def:<span id="def">0</span><div class="bar"><div id="hpFill" class="fill"></div></div><div class="bar"><div id="xpFill" class="fill"></div></div>EXP:<span id="xp">0</span>/100</div>
+<div id="mini"><canvas id="mapc" width="116" height="96"></canvas></div><div id="quest"><b>Görev</b><br>Metin kes, item düşür, efsun at.</div>
+<div id="chat"><div>GM[GADDAR]: V11.1 hedef, pet ve binek sistemi başladı.</div></div><div id="targetInfo"><b id="targetName">Hedef</b><div id="targetHp"><div></div></div></div>
+
+<button id="bagBtn" class="topBtn" onclick="togglePanel('inv');renderInv()">🎒</button><button id="bonusBtn" class="topBtn" onclick="openBonus()">🟢</button><button id="alchemyBtn" class="topBtn" onclick="openAlchemy()">🔮</button>
+<div id="inv" class="panel"><b>Karakter</b><div id="equip"></div><b>Envanter</b><div id="tabs"></div><div id="grid"></div><small>Iteme dokun: detay. Basılı tut: yere at.</small></div>
+<div id="detail" class="panel"><h3 id="detailTitle">Item</h3><div id="detailBody"></div><button onclick="detailUse()">Kullan / Tak</button><button onclick="detailUnequip()">Çıkar</button><button onclick="hide('detail')">Kapat</button></div>
+<div id="bonusPanel" class="panel"><h3>Efsun Paneli</h3>Item seç:<div id="bonusItems"></div>Efsun nesnesi seç:<div id="bonusScrolls"></div><div id="bonusText">Item ve efsun nesnesi seç.</div><button onclick="applyBonus()">Efsunla</button><button onclick="hide('bonusPanel')">Kapat</button></div>
+<div id="alchemyPanel" class="panel"><h3>Ejderha Taşı Simyası</h3><span id="alchemyStats"></span><div id="alchemySlots"></div><b>Simya Envanteri</b><div id="alchemyBag"></div><button onclick="addStone()">Taş Ver</button><button onclick="hide('alchemyPanel')">Kapat</button></div>
+<div id="shopPanel" class="panel"><h3 id="shopTitle">Dükkan</h3><div id="shopGrid"></div><div id="shopMsg"></div><button onclick="hide('shopPanel')">Kapat</button></div>
+<div id="deathPanel" class="panel"><b>Öldün</b><br><button onclick="reviveHere()">Burada Başla</button><button onclick="reviveTown()">Şehirde Başla</button></div>
+
+<div id="joy"><div id="stick"></div></div>
+<div id="skillbar"><button class="skill" onclick="useSkill(1)"><small>1</small>🌀</button><button class="skill" onclick="useSkill(2)"><small>2</small>⚡</button><button class="skill" onclick="useSkill(3)"><small>3</small>🔥</button><button class="skill" onclick="useSkill(4)"><small>4</small>💢</button></div>
+<button id="mountBtn" onclick="toggleMount()">🐎</button><button id="petBtn" onclick="togglePet()">🦊</button>
+<div id="actions"><button class="act" id="potion" onclick="usePotion()">🧪</button><button class="act" id="lootBtn" onclick="pickupNearest()">🤲</button><button class="act" id="attack">⚔️</button></div>
+
+<script>
+const W=document.getElementById('world'),P=document.getElementById('player'),N=document.getElementById('pname'),FX=document.getElementById('fx'),C=document.getElementById('mapc'),CTX=C.getContext('2d');
+let x=1120,y=1030,jx=0,jy=0,act=false,dead=false,lv=1,xp=0,yang=5000,hp=100,invPage=0,mounted=false,petActive=false,target=null;
+const DB={potion:{icon:'🧪',name:'Kırmızı İksir',type:'potion'},sword:{icon:'🗡️',name:'Kılıç +0',type:'weapon',atk:10},wide:{icon:'⚔️',name:'Geniş Kılıç +0',type:'weapon',atk:30},moon:{icon:'🌙',name:'Dolunay Kılıcı +0',type:'weapon',atk:55},armor:{icon:'🛡️',name:'Deri Zırh +0',type:'armor',def:8},plate:{icon:'🥋',name:'Kaplan Plaka +0',type:'armor',def:20},soul:{icon:'💎',name:'Ruh Taşı',type:'mat'},bonus:{icon:'🟢',name:'Efsun Nesnesi',type:'bonus'},addbonus:{icon:'📜',name:'Arttırma Kağıdı',type:'addbonus'},green:{icon:'🟩',name:'5. Efsun Nesnesi',type:'greenbonus'},neck:{icon:'📿',name:'Gümüş Kolye +0',type:'necklace',atk:6},ear:{icon:'💍',name:'Bakır Küpe +0',type:'earring',def:3}};
+let inventory=[mk('potion'),mk('potion'),mk('sword'),mk('armor'),mk('bonus'),mk('addbonus'),mk('green')], equip={weapon:null,armor:null,necklace:null,earring:null,bracelet:null,shoes:null}, bonuses={}, selected={item:null,scroll:null,detail:null}, drops=[];
+function mk(id){return{uid:'i'+Date.now()+Math.random(),id}}
+function it(o){return DB[o.id]}
+function chat(t){let c=document.getElementById('chat'),d=document.createElement('div');d.innerText='Sistem: '+t;c.appendChild(d);c.scrollTop=c.scrollHeight}
+function hide(id){document.getElementById(id).style.display='none'}function show(id){document.getElementById(id).style.display='block'}function togglePanel(id){let e=document.getElementById(id);e.style.display=e.style.display=='block'?'none':'block'}
+function rollBonus(){let p=[['Max HP',200,2000,''],['Saldırı Değeri',5,50,''],['Savunma',5,35,''],['Kritik Vuruş',2,10,'%'],['Delici Vuruş',2,10,'%'],['Canavarlara Karşı Güç',2,20,'%'],['Hayvanlara Karşı Güç',2,20,'%']][Math.floor(Math.random()*7)];return{name:p[0],value:Math.floor(Math.random()*(p[2]-p[1]+1))+p[1],suffix:p[3]}}
+function bonusHtml(uid){let a=bonuses[uid]||[];return a.length?a.map(b=>`<div class="bonusLine">${b.name} +${b.value}${b.suffix}</div>`).join(''):'<div class="noBonus">Efsun yok</div>'}
+function bonusAtk(){let v=0;Object.values(equip).filter(Boolean).forEach(o=>(bonuses[o.uid]||[]).forEach(b=>{if(b.name=='Saldırı Değeri')v+=b.value;if(b.name=='Canavarlara Karşı Güç')v+=Math.floor(b.value*1.5)}));return v}
+function bonusDef(){let v=0;Object.values(equip).filter(Boolean).forEach(o=>(bonuses[o.uid]||[]).forEach(b=>{if(b.name=='Savunma')v+=b.value}));return v}
+function atk(){return 25+lv*5+(equip.weapon?it(equip.weapon).atk||0:0)+(equip.necklace?it(equip.necklace).atk||0:0)+bonusAtk()+alchemyBonus().atk+(petActive?5:0)}
+function def(){return (equip.armor?it(equip.armor).def||0:0)+(equip.earring?it(equip.earring).def||0:0)+bonusDef()+alchemyBonus().def}
+function renderInv(){let eq=document.getElementById('equip'),tabs=document.getElementById('tabs'),grid=document.getElementById('grid');eq.innerHTML='';[['Silah','weapon'],['Zırh','armor'],['Kolye','necklace'],['Küpe','earring'],['Bilezik','bracelet'],['Ayakkabı','shoes'],['Atk',null],['Def',null]].forEach(a=>{let d=document.createElement('div');d.className='eq';let o=a[1]?equip[a[1]]:null;d.innerHTML=o?it(o).icon+`<small>${a[0]}</small>`:`<small>${a[0]}</small>`;if(o)d.onclick=()=>showDetail(o,'equip',a[1]);eq.appendChild(d)});tabs.innerHTML='';for(let p=0;p<5;p++){let b=document.createElement('button');b.className='tab '+(p==invPage?'active':'');b.innerText=p+1;b.onclick=()=>{invPage=p;renderInv()};tabs.appendChild(b)}grid.innerHTML='';let start=invPage*25;for(let i=0;i<25;i++){let idx=start+i,o=inventory[idx],d=document.createElement('div');d.className='slot';d.innerHTML=o?it(o).icon+`<small>${it(o).name}</small>`:'';if(o){d.onclick=()=>showDetail(o,'inv',idx);d.oncontextmenu=e=>{e.preventDefault();let rem=inventory.splice(idx,1)[0];dropItem(rem,x+50,y+20);renderInv()}}grid.appendChild(d)}updateHud()}
+function showDetail(o,src,slot){selected.detail={o,src,slot};document.getElementById('detailTitle').innerText=it(o).name;document.getElementById('detailBody').innerHTML=`<div style="text-align:center;font-size:28px">${it(o).icon}</div>${bonusHtml(o.uid)}`;show('detail')}
+function equipSlot(type){return{weapon:'weapon',armor:'armor',necklace:'necklace',earring:'earring',bracelet:'bracelet',shoes:'shoes'}[type]}
+function detailUse(){let d=selected.detail;if(!d)return;let o=d.o,t=it(o).type;if(t=='potion'){hp=Math.min(100,hp+50);inventory=inventory.filter(x=>x.uid!=o.uid);hide('detail');chat('İksir kullandın.')}else{let s=equipSlot(t);if(s){inventory=inventory.filter(x=>x.uid!=o.uid);if(equip[s])inventory.push(equip[s]);equip[s]=o;hide('detail');chat(it(o).name+' kuşandın.')}}renderInv()}
+function detailUnequip(){let d=selected.detail;if(!d||d.src!='equip')return;inventory.push(equip[d.slot]);equip[d.slot]=null;hide('detail');renderInv();chat('Item çıkarıldı.')}
+function openBonus(){renderBonus();show('bonusPanel')}
+function renderBonus(){let bi=document.getElementById('bonusItems'),bs=document.getElementById('bonusScrolls'),txt=document.getElementById('bonusText');bi.innerHTML='';bs.innerHTML='';inventory.concat(Object.values(equip).filter(Boolean)).forEach(o=>{if(['weapon','armor','necklace','earring'].includes(it(o).type)){let d=document.createElement('div');d.className='bslot '+(selected.item&&selected.item.uid==o.uid?'sel':'');d.innerHTML=it(o).icon+`<small>${it(o).name}</small>`;d.onclick=()=>{selected.item=o;renderBonus()};bi.appendChild(d)}});inventory.forEach((o,idx)=>{if(['bonus','addbonus','greenbonus'].includes(it(o).type)){let d=document.createElement('div');d.className='bslot '+(selected.scroll==idx?'sel':'');d.innerHTML=it(o).icon+`<small>${it(o).name}</small>`;d.onclick=()=>{selected.scroll=idx;renderBonus()};bs.appendChild(d)}});txt.innerHTML=selected.item?bonusHtml(selected.item.uid):'Item seç.'}
+function applyBonus(){if(!selected.item||selected.scroll==null){chat('Item ve efsun nesnesi seç.');return}let sc=inventory[selected.scroll],t=it(sc).type,arr=bonuses[selected.item.uid]||[];if(t=='bonus'){arr=[];for(let i=0;i<2+Math.floor(Math.random()*3);i++)arr.push(rollBonus())}else if(t=='addbonus'){if(arr.length>=4){chat('4 efsun dolu.');return}arr.push(rollBonus())}else if(t=='greenbonus'){if(arr.length<4){chat('Önce 4 efsun lazım.');return}if(arr.length>=5){chat('5. efsun var.');return}arr.push(rollBonus())}bonuses[selected.item.uid]=arr;inventory.splice(selected.scroll,1);selected.scroll=null;chat('Efsun uygulandı.');renderInv();renderBonus()}
+let alchBag=[{id:'ruby',icon:'🔴',name:'Yakut',atk:20,def:0,hp:0},{id:'diamond',icon:'⚪',name:'Elmas',atk:0,def:10,hp:150}],alchemy={ruby:null,diamond:null,jade:null,sapphire:null,garnet:null,onyx:null};
+function alchemyBonus(){let r={atk:0,def:0,hp:0};Object.values(alchemy).filter(Boolean).forEach(s=>{r.atk+=s.atk||0;r.def+=s.def||0;r.hp+=s.hp||0});return r}
+function openAlchemy(){renderAlchemy();show('alchemyPanel')}function renderAlchemy(){document.getElementById('alchemyStats').innerText=`Bonus: Atk +${alchemyBonus().atk} Def +${alchemyBonus().def} HP +${alchemyBonus().hp}`;let s=document.getElementById('alchemySlots'),b=document.getElementById('alchemyBag');s.innerHTML='';[['ruby','🔴','Yakut'],['diamond','⚪','Elmas'],['jade','🟢','Yeşim'],['sapphire','🔵','Safir'],['garnet','🟠','Lal'],['onyx','⚫','Oniks']].forEach(a=>{let o=alchemy[a[0]],d=document.createElement('div');d.className='aslot';d.innerHTML=(o?o.icon:a[1])+`<small>${a[2]}</small>`;d.onclick=()=>{if(o){alchBag.push(o);alchemy[a[0]]=null;renderAlchemy()}};s.appendChild(d)});b.innerHTML='';alchBag.forEach((o,i)=>{let d=document.createElement('div');d.className='aslot';d.innerHTML=o.icon+`<small>${o.name}</small>`;d.onclick=()=>{let old=alchemy[o.id];alchemy[o.id]=o;alchBag.splice(i,1);if(old)alchBag.push(old);renderAlchemy()};b.appendChild(d)})}
+function addStone(){let a=[['ruby','🔴','Yakut',20,0,0],['diamond','⚪','Elmas',0,10,150],['jade','🟢','Yeşim',0,0,400],['sapphire','🔵','Safir',12,0,0]][Math.floor(Math.random()*4)];alchBag.push({id:a[0],icon:a[1],name:a[2],atk:a[3],def:a[4],hp:a[5]});renderAlchemy()}
+const shopWeapons=[['sword',100],['wide',500],['moon',2500]],shopArmors=[['armor',700],['plate',2800]],shopMarket=[['potion',100],['bonus',900],['addbonus',1200],['green',3000]];
+function openShop(title,list){document.getElementById('shopTitle').innerText=title;let g=document.getElementById('shopGrid');g.innerHTML='';list.forEach(a=>{let o=DB[a[0]],d=document.createElement('div');d.className='shopItem';d.innerHTML=o.icon+`<b>${a[1]}</b><small>${o.name}</small>`;d.onclick=()=>{if(yang<a[1])chat('Yetersiz Yang');else{yang-=a[1];inventory.push(mk(a[0]));renderInv();chat(o.name+' satın alındı.')}};g.appendChild(d)});show('shopPanel')}
+function talk(t,m){document.getElementById('shopTitle').innerText=t;document.getElementById('shopGrid').innerHTML='<div style="grid-column:1/5;padding:10px">'+m+'</div>';show('shopPanel')}
+let mobs=[{el:document.getElementById('wolf1'),hp:80,max:80,alive:true},{el:document.getElementById('wolf2'),hp:80,max:80,alive:true}],metins=[{el:document.getElementById('metin1'),hp:180,max:180,alive:true},{el:document.getElementById('metin2'),hp:180,max:180,alive:true}];function bar(o){let b=document.createElement('div');b.className='hpbar';b.innerHTML='<div></div>';W.appendChild(b);o.bar=b}mobs.concat(metins).forEach(bar);mobs.forEach(m=>m.el.onclick=()=>setTarget(m,'mob'));metins.forEach(m=>m.el.onclick=()=>setTarget(m,'metin'))
+function place(){P.style.left=x+'px';P.style.top=y+'px';N.style.left=x+'px';N.style.top=(y-85)+'px';let pet=document.getElementById('pet');pet.style.left=(x-48)+'px';pet.style.top=(y+22)+'px';document.body.classList.toggle('mount',mounted);let cx=Math.min(0,Math.max(innerWidth-2500,innerWidth/2-x)),cy=Math.min(0,Math.max(innerHeight-2000,innerHeight/2-y));W.style.transform=`translate(${cx}px,${cy}px)`;drawMini()}
+function move(dx,dy){if(dead)return;let sp=mounted?1.55:1;x=Math.max(40,Math.min(2460,x+dx*sp));y=Math.max(90,Math.min(1960,y+dy*sp));place()}
+function drawMini(){CTX.clearRect(0,0,116,96);CTX.fillStyle='#2f6b35';CTX.fillRect(0,0,116,96);CTX.fillStyle='#9b7b4e';CTX.fillRect(10,41,96,8);CTX.fillRect(53,10,8,72);CTX.fillStyle='yellow';CTX.beginPath();CTX.arc(x/2500*116,y/2000*96,4,0,Math.PI*2);CTX.fill()}
+function updateBars(){mobs.concat(metins).forEach(o=>{if(!o.alive)return;let px=parseFloat(o.el.style.left),py=parseFloat(o.el.style.top);o.bar.style.left=px+'px';o.bar.style.top=(py-68)+'px';o.bar.firstChild.style.width=Math.max(0,o.hp/o.max*100)+'%'})}
+function dist(o){return Math.hypot(x-parseFloat(o.el.style.left),y-parseFloat(o.el.style.top))}
+
+function setTarget(o,type){
+target={o,type};
+document.getElementById('targetInfo').style.display='block';
+document.getElementById('targetName').innerText=type=='metin'?'Metin Taşı':(type=='mob'?'Yaratık':'Hedef');
+updateTarget();
+}
+function updateTarget(){
+if(!target||!target.o||!target.o.alive){document.getElementById('targetInfo').style.display='none';return}
+document.getElementById('targetHp').firstChild.style.width=Math.max(0,target.o.hp/target.o.max*100)+'%';
+}
+function toggleMount(){mounted=!mounted;chat(mounted?'Bineğe bindin. Hız arttı.':'Binekten indin.');place()}
+function togglePet(){petActive=!petActive;document.getElementById('pet').style.display=petActive?'block':'none';chat(petActive?'Pet çağrıldı: +5 saldırı bonusu.':'Pet geri gönderildi.');updateHud()}
+
+function attack(){if(dead)return;FX.style.left=x+'px';FX.style.top=(y-55)+'px';FX.style.display='block';setTimeout(()=>FX.style.display='none',160);let hit=null,type='';if(target&&target.o&&target.o.alive&&dist(target.o)<160){hit=target.o;type=target.type}else{mobs.forEach(m=>{if(m.alive&&dist(m)<130){hit=m;type='mob'}});metins.forEach(m=>{if(m.alive&&dist(m)<150){hit=m;type='metin'}})}if(!hit){chat('Hedef yok');return}setTarget(hit,type);hit.hp-=atk();chat((type=='metin'?'Metin taşına':'Kurda')+' vurdun.');if(type=='metin'&&Math.random()<.25)spawnSlot(hit.el);if(hit.hp<=0)kill(hit,type);updateBars();updateTarget()}
+function kill(t,type){t.alive=false;t.el.style.display='none';t.bar.style.display='none';let px=parseFloat(t.el.style.left),py=parseFloat(t.el.style.top);if(type=='metin'){dropItem(mk('soul'),px+30,py);dropItem(mk('bonus'),px-35,py);if(Math.random()<.4)dropItem(mk('addbonus'),px,py-45);if(Math.random()<.15)dropItem(mk('green'),px+50,py-40)}else dropItem(mk('potion'),px,py);xp+=type=='metin'?45:20;if(xp>=100){xp-=100;lv++;hp=100;chat('LEVEL!')}if(target&&target.o===t)target=null;updateTarget();setTimeout(()=>{t.hp=t.max;t.alive=true;t.el.style.display='block'},type=='metin'?7000:3000);renderInv()}
+function spawnSlot(base){let e=document.createElement('div');e.className='mob';e.innerHTML='👹<div class="name">Metin Slotu</div>';let bx=parseFloat(base.style.left),by=parseFloat(base.style.top);e.style.left=(bx+Math.random()*120-60)+'px';e.style.top=(by+Math.random()*120-60)+'px';W.appendChild(e);let o={el:e,hp:70,max:70,alive:true};bar(o);e.onclick=()=>setTarget(o,'mob');mobs.push(o)}
+function dropItem(o,px,py){let d=document.createElement('div');d.className='drop';d.innerHTML=it(o).icon+`<span>${it(o).name}</span>`;d.style.left=px+'px';d.style.top=py+'px';W.appendChild(d);drops.push({el:d,o,x:px,y:py})}
+function pickupNearest(){let best=-1,bd=9999;for(let i=0;i<drops.length;i++){let dd=Math.hypot(x-drops[i].x,y-drops[i].y);if(dd<bd){bd=dd;best=i}}if(best<0||bd>95){chat('Yakında item yok.');return}let d=drops[best];inventory.push(d.o);d.el.remove();drops.splice(best,1);renderInv();chat(it(d.o).name+' aldın.')}
+function usePotion(){let i=inventory.findIndex(o=>o.id=='potion');if(i>-1){inventory.splice(i,1);hp=Math.min(100,hp+50);renderInv();chat('İksir kullandın.')}else chat('İksir yok.')}
+function useSkill(n){if(n==1)chat('Hava Kılıcı aktif.');if(n==2){move(140,0);chat('Hamle.')}if(n==3){attack();attack();chat('Alan saldırısı.')}if(n==4)chat('Öfke aktif.')}
+function die(){dead=true;show('deathPanel')}function reviveHere(){dead=false;hide('deathPanel')}function reviveTown(){dead=false;x=1120;y=1030;place();hide('deathPanel')}
+function updateHud(){document.getElementById('lv').innerText=lv;document.getElementById('lvName').innerText='Lv.'+lv;document.getElementById('yang').innerText=yang;document.getElementById('atk').innerText=atk();document.getElementById('def').innerText=def();document.getElementById('xp').innerText=xp;document.getElementById('hpFill').style.width=hp+'%';document.getElementById('xpFill').style.width=xp+'%'}
+let joy=document.getElementById('joy'),stick=document.getElementById('stick');function handle(e){let t=e.touches?e.touches[0]:e,r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=t.clientX-cx,dy=t.clientY-cy,l=Math.hypot(dx,dy),m=38;if(l>m){dx=dx/l*m;dy=dy/l*m}jx=dx/m;jy=dy/m;stick.style.left=(38+dx)+'px';stick.style.top=(38+dy)+'px'}
+joy.addEventListener('touchstart',e=>{act=true;handle(e)},{passive:false});joy.addEventListener('touchmove',e=>{handle(e);e.preventDefault()},{passive:false});joy.addEventListener('touchend',()=>{act=false;jx=jy=0;stick.style.left='38px';stick.style.top='38px'});
+setInterval(()=>{if(act)move(jx*6,jy*6)},16);
+let holding=false,ht=null;let atkBtn=document.getElementById('attack');function startHold(e){e.preventDefault();holding=true;atkBtn.classList.add('hold');attack();ht=setInterval(()=>{if(holding)attack()},430)}function stopHold(){holding=false;atkBtn.classList.remove('hold');clearInterval(ht)}atkBtn.addEventListener('touchstart',startHold,{passive:false});atkBtn.addEventListener('touchend',stopHold);atkBtn.addEventListener('touchcancel',stopHold);atkBtn.addEventListener('mousedown',startHold);window.addEventListener('mouseup',stopHold);
+setInterval(()=>{mobs.forEach(m=>{if(!m.alive)return;let px=parseFloat(m.el.style.left),py=parseFloat(m.el.style.top),d=Math.hypot(x-px,y-py);if(d<360&&d>80){m.el.style.left=(px+(x-px)/d*1.6)+'px';m.el.style.top=(py+(y-py)/d*1.6)+'px'}if(d<55){hp-=Math.max(1,3-def());if(hp<=0)die()}});updateBars();updateHud()},250);
+place();renderInv();updateBars();updateHud();
+</script>
+</body></html>
